@@ -33,15 +33,15 @@ CLASSIFIERS = [
     'Topic :: System :: Hardware'
     ]
 
-setup(name='LabJackPython',
+setup(name='sti-LabJackPython',
       version='1.20150526',
       description='The LabJack Python modules for the LabJack U3, U6, UE9 and U12.',
       license='MIT X11',
       url='http://labjack.com/support/labjackpython',
       author='LabJack Corporation',
       author_email='support@labjack.com',
-      maintainer='LabJack Corporation',
-      maintainer_email='support@labjack.com',
+      maintainer='Erich Beyer',
+      maintainer_email='erich.beyer@servertech.com',
       classifiers=CLASSIFIERS,
       package_dir = {'': 'src'},
       py_modules=['LabJackPython', 'Modbus', 'u3', 'u6', 'ue9', 'u12']
