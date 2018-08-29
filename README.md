@@ -34,6 +34,7 @@ on Windows):
 From there, interacting with your devices is easy.
 
 For U3:
+```python
 >>> import u3
 >>> d = u3.U3()
 >>> d.configU3()
@@ -42,8 +43,10 @@ For U3:
  ...,
 }
 >>> d.close()
+```
 
 For U6:
+```python
 >>> import u6
 >>> d = u6.U6()
 >>> d.configU6()
@@ -52,8 +55,10 @@ For U6:
  ...,
 }
 >>> d.close()
+```
 
 For UE9:
+```python
 >>> import ue9
 >>> d = ue9.UE9()
 >>> d.commConfig()
@@ -61,8 +66,10 @@ For UE9:
  ...,
 }
 >>> d.close()
+```
 
 For U12:
+```python
 >>> import u12
 >>> d = u12.U12()
 >>> d.eAnalogIn(0)
@@ -71,6 +78,7 @@ For U12:
  'voltage': 1.42578125
 }
 >>> d.close()
+```
 
 For examples, check the Examples/ directory. For additional information, go to
 the LabJackPython page on LabJack's website:
