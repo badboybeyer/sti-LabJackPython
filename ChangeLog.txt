@@ -254,7 +254,7 @@ Version History
       endian.
     - Fixed many Pyflakes warnings such as unused variables and unused imports.
     - Removed use of "import *" from most modules.
-- Next Release
+- Jul 20, 2018
     - Moved the ctypes import after socket to prevent an "Aborted (core dump)"
       exit error on Cygwin.
     - _makeDeviceFromHandle function now gets/sets the U3's bootloaderVersion.

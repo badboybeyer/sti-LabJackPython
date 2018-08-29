@@ -2,7 +2,7 @@
 
 Cross-platform (Windows, Linux, Mac OS X) Python modules and
 examples for the LabJack U3, U6, UE9 and U12.
-05/26/2015
+2018-07-20
 support@labjack.com
 
 # Requirements

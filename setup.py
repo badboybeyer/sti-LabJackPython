@@ -34,7 +34,7 @@ CLASSIFIERS = [
     ]
 
 setup(name='sti-LabJackPython',
-      version='1.20150526',
+      version='1.20180720',
       description='The LabJack Python modules for the LabJack U3, U6, UE9 and U12.',
       license='MIT X11',
       url='http://labjack.com/support/labjackpython',
