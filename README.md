@@ -24,10 +24,11 @@ To upgrade firmware look at this page:
 
 To use Modbus on a UE9 over Ethernet, install Comm firmware 1.50 or higher.
 
-To install LabJackPython, run the following command in a terminal (remove "sudo"
-on Windows):
+# Install:
 
-    $ sudo python setup.py install
+```shell
+$ python -m pip install sti-LabjackPython
+```
 
 # Run
 
