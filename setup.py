@@ -52,5 +52,8 @@ setup(name='sti-LabJackPython',
       maintainer_email='erich.beyer@servertech.com',
       classifiers=CLASSIFIERS,
       package_dir = {'': 'src'},
-      py_modules=['LabJackPython', 'Modbus', 'u3', 'u6', 'ue9', 'u12']
+      py_modules=['LabJackPython', 'Modbus', 'u3', 'u6', 'ue9', 'u12'],
+      project_urls={
+          'Source': 'https://github.com/badboybeyer/sti-LabJackPython',
+      },
       )
