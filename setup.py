@@ -3,6 +3,7 @@ try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
+from os import path
 
 if sys.version_info[:2] < (2, 6):
     msg = ("LabJackPython requires Python 2.6 or later. "
@@ -33,9 +34,16 @@ CLASSIFIERS = [
     'Topic :: System :: Hardware'
     ]
 
+
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+    
 setup(name='sti-LabJackPython',
       version='1.20180720',
       description='The LabJack Python modules for the LabJack U3, U6, UE9 and U12.',
+      long_description=long_description,
+      long_description_content_type='text/markdown',
       license='MIT X11',
       url='http://labjack.com/support/labjackpython',
       author='LabJack Corporation',
