@@ -499,7 +499,7 @@ class U12(object):
                 handle = openDev(1, 0, devType)
 
                 if handle == 0 or handle is None:
-                    raise Exception("Couldn't open a U12. Check that one is connected and try again.")
+                    raise U12Exception("Couldn't open a U12. Check that one is connected and try again.")
                 else:
                     self.handle = ctypes.c_void_p(handle)
 
