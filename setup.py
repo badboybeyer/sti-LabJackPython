@@ -40,7 +40,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
     
 setup(name='sti-LabJackPython',
-      version='1.20180720.post1',
+      version='1.20180720.post2',
       description='The LabJack Python modules for the LabJack U3, U6, UE9 and U12.',
       long_description=long_description,
       long_description_content_type='text/markdown',
