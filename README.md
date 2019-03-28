@@ -3,15 +3,15 @@
 Cross-platform (Windows, Linux, Mac OS X) Python modules and
 examples for the LabJack U3, U6, UE9 and U12.
 
-2018-07-20
+2019-01-23
 
 support@labjack.com
 
 # Requirements
 
-LabJackPython requires Python 2.6 or higher. Modules have been updated for
-Python 3.x but not all functionality has been tested yet. Functionality used in
-examples are tested. Please report bugs to support@labjack.com or on GitHub:
+LabJackPython requires Python 2.6, 2.7 or 3.x. For Python 3.x, most
+functionality has been tested but not all yet. Please report bugs to
+support@labjack.com or on GitHub:
 
 https://github.com/labjack/LabJackPython
 
@@ -28,9 +28,27 @@ To use Modbus on a UE9 over Ethernet, install Comm firmware 1.50 or higher.
 
 # Install:
 
+To install for a user
+
 ```shell
-$ python -m pip install sti-LabjackPython
+$ python -m pip install --user --upgrade sti-LabjackPython
 ```
+
+To install systemwide (not recommended)
+
+```shell
+$ python -m pip install --upgrade sti-LabjackPython
+```
+
+If there are multiple versions Python installed, run the install command with
+the Python version you want to install to. For example, on Linux if both
+Python 2.7 and 3.5 are installed, you can install to Python 3.5 with:
+
+```shell
+$ python3.5 -m pip install sti-LabjackPython
+```
+
+
 
 # Run
 

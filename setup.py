@@ -29,6 +29,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     'Topic :: Software Development',
     'Topic :: Software Development :: Embedded Systems',
     'Topic :: System :: Hardware'
@@ -40,12 +41,12 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
     
 setup(name='sti-LabJackPython',
-      version='1.20180720.post2',
+      version='2.0.0.post1',
       description='The LabJack Python modules for the LabJack U3, U6, UE9 and U12.',
       long_description=long_description,
       long_description_content_type='text/markdown',
       license='MIT X11',
-      url='http://labjack.com/support/labjackpython',
+      url='https://labjack.com/support/software/examples/ud/labjackpython',
       author='LabJack Corporation',
       author_email='support@labjack.com',
       maintainer='Erich Beyer',

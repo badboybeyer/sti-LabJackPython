@@ -807,20 +807,20 @@ class U6(Device):
         Name: U6.spi(SPIBytes, AutoCS=True, DisableDirConfig = False,
                      SPIMode = 'A', SPIClockFactor = 0, CSPinNum = 0,
                      CLKPinNum = 1, MISOPinNum = 2, MOSIPinNum = 3)
-        
+
         Args: SPIBytes, A list of bytes to send.
               AutoCS, If True, the CS line is automatically driven low
                       during the SPI communication and brought back high
                       when done.
               DisableDirConfig, If True, function does not set the direction
                                 of the line.
-              SPIMode, 'A', 'B', 'C',  or 'D'. 
+              SPIMode, 'A', 'B', 'C',  or 'D'.
               SPIClockFactor, Sets the frequency of the SPI clock.
               CSPinNum, which pin is CS
               CLKPinNum, which pin is CLK
               MISOPinNum, which pin is MISO
               MOSIPinNum, which pin is MOSI
-        
+
         Desc: Sends and receives serial data using SPI synchronous
               communication. See Section 5.2.17 of the user's guide.
 
@@ -833,29 +833,32 @@ class U6(Device):
         if CSPINNum is not None:
             warnings.warn("CSPINNum is deprecated, use CSPinNum instead", DeprecationWarning)
             CSPinNum = CSPINNum
-        
+
         numSPIBytes = len(SPIBytes)
-        
+
+        if numSPIBytes > 50:
+            raise LabJackException("The maximum number of bytes that can be sent/received is 50")
+
         oddPacket = False
         if numSPIBytes%2 != 0:
             SPIBytes.append(0)
             numSPIBytes = numSPIBytes + 1
             oddPacket = True
-        
-        command = [ 0 ] * (13 + numSPIBytes)
-        
+
+        command = [0] * (13 + numSPIBytes)
+
         #command[0] = Checksum8
         command[1] = 0xF8
-        command[2] = 4 + (numSPIBytes/2)
+        command[2] = 4 + (numSPIBytes//2)
         command[3] = 0x3A
         #command[4] = Checksum16 (LSB)
         #command[5] = Checksum16 (MSB)
-        
+
         if AutoCS:
             command[6] |= (1 << 7)
         if DisableDirConfig:
             command[6] |= (1 << 6)
-        
+
         spiModes = ('A', 'B', 'C', 'D')
         try:
             modeIndex = spiModes.index(SPIMode)
@@ -872,19 +875,16 @@ class U6(Device):
         command[13] = numSPIBytes
         if oddPacket:
             command[13] = numSPIBytes - 1
-        
-        command[14:] = SPIBytes
-        
-        result = self._writeRead(command, 8+numSPIBytes, [ 0xF8, 1+(numSPIBytes/2), 0x3A ])
-        
-        if result[6] != 0:
-            raise LowlevelErrorException(result[6], "The spi command returned an error:\n    %s" % lowlevelErrorToString(result[6]))
 
-        return { 'NumSPIBytesTransferred' : result[7], 'SPIBytes' : result[8:] }
+        command[14:] = SPIBytes
+
+        result = self._writeRead(command, 8+numSPIBytes, [0xF8, 1+(numSPIBytes//2), 0x3A])
+
+        return {'NumSPIBytesTransferred': result[7], 'SPIBytes': result[8:]}
 
     def asynchConfig(self, Update = True, UARTEnable = True, DesiredBaud = None, BaudFactor = 63036):
         """
-        Name: U6.asynchConfig(Update = True, UARTEnable = True, 
+        Name: U6.asynchConfig(Update = True, UARTEnable = True,
                               DesiredBaud = None, BaudFactor = 63036)
         Args: Update, If True, new values are written.
               UARTEnable, If True, UART will be enabled.
@@ -946,11 +946,23 @@ class U6(Device):
     def asynchTX(self, AsynchBytes):
         """
         Name: U6.asynchTX(AsynchBytes)
+
         Args: AsynchBytes, List of bytes to send
+
         Desc: Sends bytes to the U6 UART which will be sent asynchronously
               on the transmit line. Section 5.2.19 of the User's Guide.
+
+        returns a dictionary:
+        {
+            'NumAsynchBytesSent' : Number of Asynch Bytes Sent
+            'NumAsynchBytesInRXBuffer' : How many bytes are currently in the
+                                         RX buffer.
+        }
         """
         numBytes = len(AsynchBytes)
+
+        if numBytes > 56:
+            raise LabJackException("The maximum number of bytes that can be sent is 56")
 
         oddPacket = False
         if numBytes % 2 != 0:
@@ -968,25 +980,45 @@ class U6(Device):
         #commmand[6] = 0x00
         command[7] = numBytes
         if oddPacket:
-            command[7] = numBytes-1
+            command[7] = numBytes - 1
         command[8:] = AsynchBytes
 
-        result = self._writeRead(command, 10, [ 0xF8, 0x02, 0x15])
+        result = self._writeRead(command, 10, [0xF8, 0x02, 0x15])
 
         return {'NumAsynchBytesSent': result[7], 'NumAsynchBytesInRXBuffer': result[8]}
 
     def asynchRX(self, Flush = False):
         """
         Name: U6.asynchRX(Flush = False)
+
         Args: Flush, If True, empties the entire 256-byte RX buffer.
+
         Desc: Sends bytes to the U6 UART which will be sent asynchronously
               on the transmit line. Section 5.2.20 of the User's Guide.
+
+        returns a dictonary:
+        {
+            'AsynchBytes' : List of received bytes
+            'NumAsynchBytesInRXBuffer' : Number of AsynchBytes are in the RX
+                                         Buffer.
+        }
         """
-        command = [0, 0xF8, 0x01, 0x16, 0, 0, 0, int(Flush)]
+        # command = [0, 0xF8, 0x01, 0x16, 0, 0, 0, int(Flush)]
+        command = [0] * 8
+
+        #command[0] = Checksum8
+        command[1] = 0xF8
+        command[2] = 0x01
+        command[3] = 0x16
+        #command[4] = Checksum16 (LSB)
+        #command[5] = Checksum16 (MSB)
+        #command[6] = 0x00
+        if Flush:
+            command[7] = 1
 
         result = self._writeRead(command, 40, [0xF8, 0x11, 0x16])
 
-        return {'NumAsynchBytesInRXBuffer': result[7], 'AsynchBytes': result[8:]}
+        return {'AsynchBytes': result[8:], 'NumAsynchBytesInRXBuffer': result[7]}
 
     def i2c(self, Address, I2CBytes, EnableClockStretching = False, NoStopWhenRestarting = False, ResetAtStart = False, SpeedAdjust = 0, SDAPinNum = 0, SCLPinNum = 1, NumI2CBytesToReceive = 0, AddressByte = None):
         """
@@ -995,6 +1027,7 @@ class U6(Device):
                      ResetAtStart = False, SpeedAdjust = 0,
                      SDAPinNum = 0, SCLPinNum = 1,
                      NumI2CBytesToReceive = 0, AddressByte = None)
+
         Args: Address, the address (Not shifted over)
               I2CBytes, a list of bytes to send
               EnableClockStretching, True enables clock stretching
@@ -1007,10 +1040,15 @@ class U6(Device):
               NumI2CBytesToReceive, Number of I2C bytes to expect back.
               AddressByte, The address as you would put it in the low-level
                            packet. Overrides Address. Optional.
+
         Desc: Sends and receives serial data using I2C synchronous
               communication. Section 5.2.21 of the User's Guide.
         """
         numBytes = len(I2CBytes)
+        if numBytes > 50:
+            raise LabJackException("The maximum number of bytes that can be sent is 50")
+        if NumI2CBytesToReceive > 52:
+            raise LabJackException("The maximum number of bytes that can be received is 52")
 
         oddPacket = False
         if numBytes % 2 != 0:
@@ -1065,19 +1103,32 @@ class U6(Device):
     def sht1x(self, DataPinNum = 0, ClockPinNum = 1, SHTOptions = 0xc0):
         """
         Name: U6.sht1x(DataPinNum = 0, ClockPinNum = 1, SHTOptions = 0xc0)
-        Args: DataPinNum, Which pin is the Data line
-              ClockPinNum, Which line is the Clock line
-              SHTOptions (and proof people read documentation):
-                bit 7 = Read Temperature
-                bit 6 = Read Realtive Humidity
-                bit 2 = Heater. 1 = on, 0 = off
-                bit 1 = Reserved at 0
-                bit 0 = Resolution. 1 = 8 bit RH, 12 bit T; 0 = 12 RH, 14 bit T
-        Desc: Reads temperature and humidity from a Sensirion SHT1X sensor.
-              Section 5.2.22 of the User's Guide.
+        Args: DataPinNum, Which pin is the Data
+              ClockPinNum, Which pin is the Clock
+              SHTOptions:
+                  bit 7 = Read Relative Humidity
+                  bit 6 = Read Temperature
+                  bit 2 = Heater: 1 = on, 0 = off
+                  bit 1 = Reserved at 0
+                  bit 0 = Resolution:
+                          1 = 8-bit RH, 12-bit Temp
+                          0 = 12-bit RH, 14-bit Temp
+        Desc: Reads temperature and humidity from a Sensirion SHT1X sensor,
+              which is used by the EI-1050.
+              See section 5.2.22 of the User's Guide for more details.
+
+        Returns a dictonary:
+        {
+            'StatusReg' : SHT1X status register
+            'StatusRegCRC' : SHT1X status register CRC value
+            'Temperature' : The temperature in C
+            'TemperatureCRC' : The CRC value for the temperature
+            'Humidity' : The humidity
+            'HumidityCRC' : The CRC value for the humidity
+        }
         """
-        command = [ 0 ] * 10
-        
+        command = [0] * 10
+
         #command[0] = Checksum8
         command[1] = 0xF8
         command[2] = 0x02
@@ -1088,18 +1139,18 @@ class U6(Device):
         command[7] = ClockPinNum
         #command[8] = Reserved
         command[9] = SHTOptions
-        
-        result = self._writeRead(command, 16, [ 0xF8, 0x05, 0x39])
-        
+
+        result = self._writeRead(command, 16, [0xF8, 0x05, 0x39])
+
         val = (result[11]*256) + result[10]
         temp = -39.60 + 0.01*val
-        
+
         val = (result[14]*256) + result[13]
         humid = -4 + 0.0405*val + -.0000028*(val*val)
         humid = (temp - 25)*(0.01 + 0.00008*val) + humid
-        
-        return { 'StatusReg' : result[8], 'StatusCRC' : result[9], 'Temperature' : temp, 'TemperatureCRC' : result[12], 'Humidity' : humid, 'HumidityCRC' : result[15] }
-        
+
+        return {'StatusReg': result[8], 'StatusCRC': result[9], 'Temperature': temp, 'TemperatureCRC': result[12], 'Humidity': humid, 'HumidityCRC': result[15]}
+
     # --------------------------- Old U6 code -------------------------------
 
     def _readCalDataBlock(self, n):
